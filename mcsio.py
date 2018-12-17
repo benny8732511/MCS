@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 import time
 import Adafruit_DHT
@@ -5,8 +6,6 @@ import httplib
 import urllib
 import json
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 deviceId="DhlBBf0i"
 deviceKey="E5TTTEIDWWuqkxkj"
 
@@ -40,16 +39,18 @@ else:
     sys.exit(1)
 humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
 
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 while True:
         humidity, temperature= Adafruit_DHT.read_retry(sensor, pin)
-	SwitchStatus=GPIO.input(24)
+	SwitchStatus=GPIO.input(17)
 	if(SwitchStatus==0):
 		print('Button pressed')
-	else
+	else:
 		print('Button released')
         if humidity is not None and temperature is not None:
                 print('Temp={0:0.1f}*  Humidity={1:0.1f}%'.format(temperature, humidity))
-                payload = {"datapoints":[{"dataChnId":"humi0732","values":{"value":humidity}},{"dataChnId":"temp0732","values":{"value":temperature}},{"dataChId":"SwitchStatus","values":{"value":SwitchStatus}}]}
+                payload = {"datapoints":[{"dataChnId":"humi0732","values":{"value":humidity}},{"dataChnId":"temp0732","values":{"value":temperature}},{"dataChnId":"SwitchStatus","values":{"value":SwitchStatus}}]}
                 post_to_mcs(payload)
         else:
                 print('Failed to get reading. Try again!')
